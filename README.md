@@ -23,5 +23,5 @@ Abrir `PingPongMultiPlayer.uproject` con Unreal Engine 5.6.
 
 ## Tecnología
 - Unreal Engine 5.6 (Blueprints)
-- Online Subsystem (sesiones)
+- Online Subsystem: **NULL** (LAN, desarrollo) / **Steam** (demo, punto extra) — toggle de 1 línea. Ver [docs/Multiplayer-Setup.md](docs/Multiplayer-Setup.md)
 - Git LFS para los assets binarios (`.uasset`, `.umap`, texturas, audio, etc.)
