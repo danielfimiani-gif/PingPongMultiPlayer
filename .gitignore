@@ -1,0 +1,38 @@
+# ============================================================
+#  .gitignore para proyecto Unreal Engine 5.6 (Blueprint)
+# ============================================================
+
+# Carpetas generadas por el editor / build (nunca se versionan)
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.suo
+*.xcodeproj
+*.xcworkspace
+
+# Archivos de proyecto de IDE generados
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Cache y temporales
+*.tmp
+*.log
+*.pdb
+
+# macOS / Windows basura del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Plugins de terceros compilados (mantener solo el source si lo hubiera)
+Plugins/**/Binaries/
+Plugins/**/Intermediate/
