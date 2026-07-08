@@ -4,6 +4,7 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystemUtils.h"
+#include "Online/OnlineSessionNames.h"
 
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem() :
 		CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &UMultiplayerSessionsSubsystem::OnCreateSessionComplete)),
@@ -41,13 +42,14 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	CreateSessionCompleteDelegateHandle = SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
 	
 	LastSessionSettings = MakeShareable(new FOnlineSessionSettings());
-	LastSessionSettings->bIsLANMatch = Online::GetSubsystem(GetWorld())->GetSubsystemName() == "NULL";
+	const bool bIsSteam = Online::GetSubsystem(GetWorld())->GetSubsystemName() != "NULL";
+	LastSessionSettings->bIsLANMatch = !bIsSteam; 
 	LastSessionSettings->NumPublicConnections = NumPublicConnections;
 	LastSessionSettings->bAllowJoinInProgress = true;
-	LastSessionSettings->bAllowJoinViaPresence = false;
+	LastSessionSettings->bAllowJoinViaPresence = bIsSteam;
 	LastSessionSettings->bShouldAdvertise = true;
-	LastSessionSettings->bUsesPresence = false;
-	LastSessionSettings->bUseLobbiesIfAvailable = false;
+	LastSessionSettings->bUsesPresence = bIsSteam;
+	LastSessionSettings->bUseLobbiesIfAvailable = bIsSteam;
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	LastSessionSettings->Set(FName("HostName"), HostName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
@@ -88,9 +90,16 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
 	FindSessionCompleteDelegateHandle = SessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
 	
 	LastSessionSearch = MakeShareable(new FOnlineSessionSearch());
-	LastSessionSearch->MaxSearchResults = MaxSearchResults;
-	LastSessionSearch->bIsLanQuery = Online::GetSubsystem(GetWorld())->GetSubsystemName() == "NULL";
+	const bool bIsSteam = Online::GetSubsystem(GetWorld())->GetSubsystemName() != "NULL";
+	LastSessionSearch->MaxSearchResults = bIsSteam ? 10000 : MaxSearchResults;
+	LastSessionSearch->bIsLanQuery = !bIsSteam;
 
+	if (bIsSteam)
+	{
+		LastSessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		LastSessionSearch->QuerySettings.Set(FName("MatchType"), FString("Pong"), EOnlineComparisonOp::Equals);
+	}
+	
 	const ULocalPlayer* LocalPlayer = GetGameInstance()->GetFirstGamePlayer();
 	if (!SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef()))
 	{
