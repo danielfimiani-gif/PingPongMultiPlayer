@@ -5,6 +5,7 @@
 # Carpetas generadas por el editor / build (nunca se versionan)
 Binaries/
 Build/
+Builds/
 DerivedDataCache/
 Intermediate/
 Saved/
